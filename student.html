@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        function getStudent(student) {
+          return  `<tr><td >${student.name}</td>
+                    <td >${student.grade}</td>` +
+            `<td><button type="submit"  value="${student.id}" onclick="editForm(this)">Edit</button></td>
+                <td><button type="submit"  value="${student.id}" onclick="deleteStudent(this)">Delete</button></td></tr>`;
+        }
+
+        function showList() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/student/list",
+                success: function (data) {
+                    let content = '<tr>\n' +
+                        '<th>Name</th>\n' +
+                        '<th>Grade</th>\n' +
+                        '<th>Edit</th>' +
+                        '<th>Delete</th>'
+                    '</tr>';
+                    for (let i = 0; i < data.length; i++) {
+                        content += getStudent(data[i]);
+                    }
+                    document.getElementById("studentList").innerHTML = content;
+                }
+            })
+        }
+
+        showList();
+
+        function addNewStudent() {
+            let name = $('#name').val();
+            let grade = $('#grade').val();
+            let newStudent = {
+                name: name,
+                grade: grade
+            };
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                data: JSON.stringify(newStudent),
+                url: "http://localhost:8080/student/create",
+                success: showList
+            })
+            event.preventDefault();
+        }
+
+        function deleteStudent(a) {
+            let id = a.getAttribute("value");
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:8080/student/delete/" + id,
+                success: function () {
+                    a.parentElement.parentElement.remove();
+                }
+            })
+            event.preventDefault();
+        }
+
+        function editForm(a) {
+            let id = a.getAttribute("value");
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/student/findOne/" + id,
+                success: function (student) {
+                    $('#editId').val(student.id);
+                    $('#editName').val(student.name);
+                    $('#editGrade').val(student.grade);
+                }
+            })
+            event.preventDefault();
+        }
+
+        function updateStudent() {
+            let id = $('#editId').val();
+            let name = $('#editName').val();
+            let grade = $('#editGrade').val();
+            let newStudent = {
+                id: id,
+                name: name,
+                grade: grade
+            };
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "PUT",
+                data: JSON.stringify(newStudent),
+                url: "http://localhost:8080/student/edit",
+                success : showList
+            })
+            event.preventDefault();
+        }
+
+
+    </script>
+</head>
+<body>
+<h1>Studen List</h1>
+<form id="addStudent">
+    <table>
+        <tr>
+            <td>Student Name :</td>
+            <td><input type="text" id="name" placeholder="Student Name"></td>
+        </tr>
+        <tr>
+            <td>Grade :</td>
+            <td><input type="text" id="grade" placeholder="Grade"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Add" onclick="addNewStudent()"></td>
+        </tr>
+    </table>
+</form>
+<br>
+
+
+<table border="1" id="studentList">
+</table>
+
+<h3>Update Form</h3>
+<form id="editForm">
+    <table>
+        <input type="text" id="editId" hidden="hidden">
+        <tr>
+            <td>Edit Name :</td>
+            <td><input type="text" id="editName"></td>
+        </tr>
+        <tr>
+            <td>Edit Grade :</td>
+            <td><input type="text" id="editGrade"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Update" onclick="updateStudent()"></td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>
