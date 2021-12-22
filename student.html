@@ -6,6 +6,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type="text/javascript">
 
+        let student = JSON.parse(localStorage.getItem("student"))
         function getStudent(student) {
           return  `<tr><td >${student.name}</td>
                     <td >${student.grade}</td>` +
@@ -15,6 +16,9 @@
 
         function showList() {
             $.ajax({
+                headers:{
+                    'Authorization': 'Bearer '+ student.accessToken
+                },
                 type: "GET",
                 url: "http://localhost:8080/student/list",
                 success: function (data) {
@@ -43,6 +47,7 @@
             };
             $.ajax({
                 headers: {
+                        'Authorization': 'Bearer '+ student.accessToken,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
@@ -57,6 +62,9 @@
         function deleteStudent(a) {
             let id = a.getAttribute("value");
             $.ajax({
+                headers:{
+                    'Authorization': 'Bearer '+ student.accessToken
+                },
                 type: "DELETE",
                 url: "http://localhost:8080/student/delete/" + id,
                 success: function () {
@@ -69,6 +77,9 @@
         function editForm(a) {
             let id = a.getAttribute("value");
             $.ajax({
+                headers:{
+                    'Authorization': 'Bearer '+ student.accessToken
+                },
                 type: "GET",
                 url: "http://localhost:8080/student/findOne/" + id,
                 success: function (student) {
@@ -91,6 +102,9 @@
             };
             $.ajax({
                 headers: {
+
+                        'Authorization': 'Bearer '+ student.accessToken,
+
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
